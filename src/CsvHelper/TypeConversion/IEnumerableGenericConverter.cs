@@ -28,19 +28,37 @@ namespace CsvHelper.TypeConversion
 			listType = listType.MakeGenericType(type);
 			var list = (IList)ObjectResolver.Current.Resolve(listType);
 
-			if (memberMapData.IsNameSet || row.Configuration.HasHeaderRecord && !memberMapData.IsIndexSet)
+			if (row.Configuration.HasHeaderRecord)
 			{
-				// Use the name.
-				var nameIndex = 0;
-				while (true)
+				if (memberMapData.IsNameSet || !memberMapData.IsIndexSet)
 				{
-					if (!row.TryGetField(type, memberMapData.Names.FirstOrDefault(), nameIndex, out var field))
-					{
-						break;
-					}
+					// Use the name.
+					var nameIndex = 0;
 
-					list.Add(field);
-					nameIndex++;
+					while (true)
+					{
+						if (!row.TryGetField(type, memberMapData.Names.FirstOrDefault(), nameIndex, out var field))
+						{
+							break;
+						}
+
+						list.Add(field);
+						nameIndex++;
+					}
+				}
+				else
+				{
+					// Use the index.
+					var indexEnd = memberMapData.IndexEnd < memberMapData.Index
+						? row.Parser.Count - 1
+						: memberMapData.IndexEnd;
+
+					for (var i = memberMapData.Index; i <= indexEnd; i++)
+					{
+						var field = row.GetField(type, i);
+
+						list.Add(field);
+					}
 				}
 			}
 			else

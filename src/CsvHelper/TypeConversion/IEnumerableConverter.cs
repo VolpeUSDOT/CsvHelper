@@ -48,19 +48,38 @@ namespace CsvHelper.TypeConversion
 		{
 			var list = new List<string>();
 
-			if (memberMapData.IsNameSet || row.Configuration.HasHeaderRecord && !memberMapData.IsIndexSet)
+			if (row.Configuration.HasHeaderRecord)
 			{
-				// Use the name.
-				var nameIndex = 0;
-				while (true)
+				if (memberMapData.IsNameSet || !memberMapData.IsIndexSet)
 				{
-					if (!row.TryGetField(memberMapData.Names.FirstOrDefault(), nameIndex, out string field))
-					{
-						break;
-					}
+					// Use the name.
+					var nameIndex = 0;
 
-					list.Add(field);
-					nameIndex++;
+					while (true)
+					{
+						if (!row.TryGetField(memberMapData.Names.FirstOrDefault(), nameIndex, out string field))
+						{
+							break;
+						}
+
+						list.Add(field);
+						nameIndex++;
+					}
+				}
+				else
+				{
+					// Use the index.
+					var indexEnd = memberMapData.IndexEnd < memberMapData.Index
+						? row.Parser.Count - 1
+						: memberMapData.IndexEnd;
+
+					for (var i = memberMapData.Index; i <= indexEnd; i++)
+					{
+						if (row.TryGetField(i, out string field))
+						{
+							list.Add(field);
+						}
+					}
 				}
 			}
 			else
