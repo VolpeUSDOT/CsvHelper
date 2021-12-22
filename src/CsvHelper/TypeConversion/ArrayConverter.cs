@@ -26,48 +26,28 @@ namespace CsvHelper.TypeConversion
 			Array array;
 			var type = memberMapData.Member.MemberType().GetElementType();
 
-			if (row.Configuration.HasHeaderRecord)
+			if (memberMapData.IsNameSet || row.Configuration.HasHeaderRecord && !memberMapData.IsIndexSet)
 			{
-				if (memberMapData.IsNameSet || !memberMapData.IsIndexSet)
+				// Use the name.
+				var list = new List<object>();
+				var nameIndex = 0;
+
+				while (true)
 				{
-					// Use the name.
-					var list = new List<object>();
-					var nameIndex = 0;
-
-					while (true)
+					if (!row.TryGetField(type, memberMapData.Names.FirstOrDefault(), nameIndex, out var field))
 					{
-						if (!row.TryGetField(type, memberMapData.Names.FirstOrDefault(), nameIndex, out var field))
-						{
-							break;
-						}
-
-						list.Add(field);
-						nameIndex++;
+						break;
 					}
 
-					array = (Array)ObjectResolver.Current.Resolve(memberMapData.Member.MemberType(), list.Count);
-
-					for (var i = 0; i < list.Count; i++)
-					{
-						array.SetValue(list[i], i);
-					}
+					list.Add(field);
+					nameIndex++;
 				}
-				else
+
+				array = (Array)ObjectResolver.Current.Resolve(memberMapData.Member.MemberType(), list.Count);
+
+				for (var i = 0; i < list.Count; i++)
 				{
-					// Use the index.
-					var indexEnd = memberMapData.IndexEnd < memberMapData.Index
-						? row.Parser.Count - 1
-						: memberMapData.IndexEnd;
-
-					var arraySize = indexEnd - memberMapData.Index + 1;
-					array = (Array)ObjectResolver.Current.Resolve(memberMapData.Member.MemberType(), arraySize);
-					var arrayIndex = 0;
-
-					for (var i = memberMapData.Index; i <= indexEnd; i++)
-					{
-						array.SetValue(row.GetField(type, i), arrayIndex);
-						arrayIndex++;
-					}
+					array.SetValue(list[i], i);
 				}
 			}
 			else
@@ -86,7 +66,6 @@ namespace CsvHelper.TypeConversion
 					array.SetValue(row.GetField(type, i), arrayIndex);
 					arrayIndex++;
 				}
-
 			}
 
 			return array;

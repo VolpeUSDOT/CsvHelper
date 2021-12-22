@@ -139,7 +139,25 @@ namespace CsvHelper.Expressions
 					}
 					else
 					{
-						if (parameterMap.Data.IsIndexSet)
+						if (parameterMap.Data.IsNameSet && !parameterMap.Data.IsIndexSet)
+						{
+							index = reader.GetFieldIndex(parameterMap.Data.Names.ToArray(), parameterMap.Data.NameIndex, parameterMap.Data.IsOptional);
+
+							if (index == -1)
+							{
+								if (parameterMap.Data.IsDefaultSet || parameterMap.Data.IsOptional)
+								{
+									var defaultExpression = CreateDefaultExpression(parameterMap, Expression.Constant(string.Empty));
+									argumentExpressions.Add(defaultExpression);
+
+									continue;
+								}
+
+								// Skip if the index was not found.
+								continue;
+							}
+						}
+						else if (parameterMap.Data.IsIndexSet || !parameterMap.Data.IsOptional)
 						{
 							// Use index.
 							index = parameterMap.Data.Index;
@@ -274,20 +292,8 @@ namespace CsvHelper.Expressions
 			}
 			else
 			{
-				if (memberMap.Data.IsIndexSet)
-				{
-					// Use the index.
-					index = memberMap.Data.Index;
-				}
-				else if (memberMap.Data.IsDefaultSet)
-				{
-					return CreateDefaultExpression(memberMap, Expression.Constant(string.Empty));
-				}
-				else
-				{
-					// Skip if the index was not found.
-					return null;
-				}
+				// Use the index.
+				index = memberMap.Data.Index;
 			}
 
 			// Get the field using the field index.
