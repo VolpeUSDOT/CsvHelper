@@ -1,10 +1,4 @@
-﻿// ----------------------------------------------------------------------------------------------------
-// <copyright file="MapNameAndIndexTests.cs" company="Federal Aviation Administration">
-//     Federal Aviation Administration.
-// </copyright>
-// ----------------------------------------------------------------------------------------------------
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,6 +9,7 @@ using CsvHelper.Configuration;
 using CsvHelper.Tests.Mocks;
 
 using Xunit;
+using Xunit.Sdk;
 
 namespace CsvHelper.Tests.Mappings.ConstructorParameter;
 
@@ -34,17 +29,14 @@ public class MapNameAndIndexTests
 		sb.AppendLine($"{twoDigit},{twoString}");
 
 		CsvConfiguration config = new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false };
-		var records = new List<DataRecord>();
+		List<DataRecord> records;
 
-		// Act
 		using (var csvReader = new CsvReader(new StringReader(sb.ToString()), config))
 		{
 			csvReader.Context.RegisterClassMap<NameAndIndexMap>();
 
-			while (await csvReader.ReadAsync())
-			{
-				records.Add(csvReader.GetRecord<DataRecord>());
-			}
+			// Act
+			records = await csvReader.GetRecordsAsync<DataRecord>().ToListAsync();
 		}
 
 		// Assert
