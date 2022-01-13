@@ -1,3 +1,7 @@
+This version of CSV Helper contains a fix that is used by the Volpe AEDT project (https://aedt.faa.gov).
+This fork can eventually be removed if the associated pull request eventually has been merged into the official repository:
+https://github.com/JoshClose/CsvHelper/pull/1925
+
 # CsvHelper
 
 [![Join the chat at https://gitter.im/CsvHelper/Lobby](https://badges.gitter.im/CsvHelper/Lobby.svg)](https://gitter.im/CsvHelper/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
