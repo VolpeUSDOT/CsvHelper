@@ -1,5 +1,4 @@
-This version of CSV Helper contains a fix that is used by the Volpe AEDT project (https://aedt.faa.gov).
-This fork can eventually be removed if the associated pull request eventually has been merged into the official repository:
+This version (branch: https://github.com/VolpeUSDOT/CsvHelper/tree/AllowClassMapToDefineNameAndIndexRunWithoutHeaderNoException) of CSV Helper contains a fix that is used by the Volpe AEDT project (https://aedt.faa.gov). This fork can eventually be removed if the associated pull request eventually has been merged into the official repository:
 https://github.com/JoshClose/CsvHelper/pull/1925
 
 # CsvHelper
